@@ -24,7 +24,7 @@ function doTranslation(
       delete new_args.languages;
       doTranslation(new_args, _translation_jobs);
     }
-    return;
+    return _translation_jobs;
   }
 
   console.log(`Translating to ${to}`);
@@ -48,7 +48,7 @@ function doTranslation(
     if (translationResult.kind === "failure") {
       console.error("Error translating to", to);
       console.error(translationResult.error);
-      return;
+      return _translation_jobs;
     }
 
     const translation = translationResult.result;

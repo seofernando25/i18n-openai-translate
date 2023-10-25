@@ -6,10 +6,10 @@ let client: OpenAI | null = null;
 function prompt(
   from_language: string,
   to_language: string,
-  ctx: string = "General Translation",
-  input: string = ""
+  ctx: string,
+  input: string
 ) {
-  return `Translate an i18n JSON from ${from_language} to ${to_language} in the context of "${ctx}"\n[INPUT]\n${input}`.trim();
+  return `Translate an i18n JSON from ${from_language} to ${to_language} in the context of "${ctx}"\nYou May return a valid JSON file given: ${input}`.trim();
 }
 
 export async function translate(
@@ -31,7 +31,7 @@ export async function translate(
 
     const res = await client.completions.create({
       model: "gpt-3.5-turbo-instruct",
-      prompt: prompt(from, to, ctx, text),
+      prompt: prompt(from, to, ctx || "General Translation", text),
       temperature: 0,
       n: 1,
       max_tokens: 1000,

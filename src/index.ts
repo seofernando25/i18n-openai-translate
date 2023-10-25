@@ -1,67 +1,71 @@
 import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
 import doTranslation from "./do-translations";
 import { TC_ALL } from "./util";
 
-const argsPromise = yargs(process.argv.slice(2)).options({
-  from: {
-    type: "string",
-    default: "[infer language]",
-    describe: "The language to translate from",
+const program = yargs(hideBin(process.argv))
+  .scriptName("i18n-openai-translate")
+  .option("from", {
     alias: "f",
-  },
-
-  to: {
     type: "string",
-    describe: "The language to translate to",
+    description: "The language to translate from",
+  })
+  .option("to", {
     alias: "t",
-  },
-
-  languages: {
-    type: "array",
-    describe: "The languages to translate to",
+    type: "string",
+    description: "The language to translate to",
+  })
+  .option("languages", {
     alias: "l",
-  },
-
-  input: {
-    type: "string",
-    describe: "The input file to translate",
-    alias: "i",
-  },
-
-  ctx: {
-    type: "string",
-    default: "General Translation",
-    describe: "Additional context to use",
+    type: "array",
+    description: "The languages to translate to",
+  })
+  .option("ctx", {
     alias: "c",
-  },
-
-  save: {
-    type: "boolean",
-    describe: "Save the output to a file of language name",
+    type: "string",
+    description: "Additional context to use",
+  })
+  .option("save", {
     alias: "s",
-  },
-
-  pretty: {
     type: "boolean",
-    describe: "Pretty print the output",
+    description: "Save the output to a file of language name",
+  })
+  .option("pretty", {
     alias: "p",
-  },
-}).argv;
+    type: "boolean",
+    description: "Pretty print the output",
+  })
+  .option("input", {
+    alias: "i",
+    type: "string",
+    description: "The input file to translate",
+  })
+  .demandOption("input", "Provide an input file to translate");
 
-export type MainArgs = Awaited<typeof argsPromise>;
+const args = program.parseSync();
 
-async function main() {
-  const args = await argsPromise;
-  if (args.languages && args.languages.includes("tc_all")) {
-    args.languages = TC_ALL;
-  }
-
-  const translationJobs = doTranslation(args);
-  const promises = await Promise.all(translationJobs);
-  const hasFailures = promises.some((p) => p.kind === "failure");
-  if (hasFailures) {
-    console.error("Some translations failed");
-    process.exit(1);
-  }
+if (
+  (args.languages && args.languages.includes("tc_all")) ||
+  args.to === "tc_all"
+) {
+  args.languages = TC_ALL;
+  args.to = "";
 }
-main();
+
+const translationJobs = doTranslation(args);
+
+Promise.all(translationJobs)
+  .then((promises) => {
+    const hasFailures = promises.some((p) => p.kind === "failure");
+    if (hasFailures) {
+      console.error("Some translations failed");
+      process.exit(1);
+    }
+  })
+  .catch((e) => {
+    console.error("Some translations failed");
+    console.error(e);
+    process.exit(1);
+  });
+
+export type MainArgs = typeof args;
