@@ -37,6 +37,20 @@ i18n-openai-translate  -i en.json --to fr
 
 You can set up your OpenAI API Key by setting the `OPENAI_API_KEY` environment variable.
 
+Here are the usage flags for the program:
+
+```text
+--help: Shows the help message for the program.
+--version: Shows the version number of the program.
+-f, --from: Specifies the language to translate from.
+-t, --to: Specifies the language to translate to.
+-l, --languages: Specifies the languages to translate to as an array.
+-c, --ctx: Specifies additional context to use.
+-s, --save: Specifies whether to save the output to a file or stdout.
+-p, --pretty: Specifies whether to pretty print the output.
+-i, --input: Specifies the input file to translate, which is required.
+```
+
 ---
 
 ## 🔒 License
