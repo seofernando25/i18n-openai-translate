@@ -1,33 +1,37 @@
+import oai from "@src/translators/openai";
+import { assert } from "console";
 import fs from "fs";
 import OpenAI from "openai";
 import yargs from "yargs";
-
+import { Translator } from "./translation_service";
+import { TC_ALL } from "./util";
 const prompt = (from_language: string, to_language: string, ctx: string) =>
   `
-[target]
-goal= translate i18n JSON from ${from_language} to ${to_language}.
-context= ${ctx} 
-
-[output]
-minified=true
-single_line_output: true
-space_after_colon: false
+Translate an i18n JSON from ${from_language} to ${to_language}.
+Context = ${ctx} 
 `.trim();
 
-async function main() {
-  const argv = await yargs(process.argv.slice(2)).options({
+(async () => {
+  const providers = [oai] satisfies Translator[];
+
+  const args = await yargs(process.argv.slice(2)).options({
     from: {
       type: "string",
-      default: "english",
+      default: "[infer language]",
       describe: "The language to translate from",
       alias: "f",
     },
 
     to: {
       type: "string",
-      default: "french",
       describe: "The language to translate to",
       alias: "t",
+    },
+
+    languages: {
+      type: "array",
+      describe: "The languages to translate to",
+      alias: "l",
     },
 
     input: {
@@ -38,54 +42,102 @@ async function main() {
 
     ctx: {
       type: "string",
-      default: "General",
+      default: "General Translation",
       describe: "Additional context to use",
       alias: "c",
     },
+
+    save: {
+      type: "boolean",
+      describe: "Save the output to a file of language name",
+      alias: "s",
+    },
+
+    providers: {
+      type: "array",
+      describe: "The providers to use in order of fallback. Available: openai",
+      default: "openai",
+      alias: "p",
+    },
   }).argv;
 
-  const { from, to, input } = argv;
-
-  //   Check if file exists
-  if (!input || !fs.existsSync(input)) {
-    console.error("Input file does not exist");
-    process.exit(1);
+  if (args.languages && args.languages.includes("tc_all")) {
+    args.languages = TC_ALL;
   }
-
-  // Minify the JSON
-  const jsonStr = JSON.stringify(
-    JSON.parse(fs.readFileSync(input, "utf8")),
-    null,
-    0
-  );
 
   const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
 
-  const chatCompletion = await openai.chat.completions.create({
-    temperature: 0,
-    messages: [
-      { role: "system", content: prompt(from, to) },
-      { role: "user", content: jsonStr },
-    ],
-    model: "gpt-3.5-turbo",
-  });
+  const translationJobs: Promise<unknown>[] = [];
 
-  // Print the result
-  for (const choices of chatCompletion.choices) {
-    console.log("###############");
-    console.log();
-    console.log("Choice:");
-    console.log(choices.message.content);
-    console.log();
-    console.log("----------------");
-    console.log();
-    console.log("Finish Reason:");
-    console.log(choices.finish_reason);
-    console.log();
-    console.log("----------------");
-  }
-}
+  const main = async (argv: typeof args) => {
+    const { from, to, languages, input, ctx, save } = argv;
 
-main();
+    if ((!to && !languages) || (to && languages)) {
+      console.error("You must specify either --to or --languages");
+      process.exit(1);
+    }
+
+    // If languages recursive call
+    if (languages) {
+      for (const lang of languages) {
+        let new_args = {
+          ...argv,
+          to: lang.toString(),
+        };
+        delete new_args.languages;
+        assert(!new_args.languages, "Languages should be deleted");
+        main(new_args);
+      }
+      return;
+    }
+
+    console.log(`Translating to ${to}`);
+    //   Check if file exists
+    if (!input || !fs.existsSync(input)) {
+      console.error("Input file does not exist");
+      process.exit(1);
+    }
+
+    // Minify the JSON
+    const jsonStr = JSON.stringify(
+      JSON.parse(fs.readFileSync(input, "utf8")),
+      null,
+      0
+    );
+
+    const chatPromise = openai.chat.completions.create({
+      temperature: 0,
+      n: 1,
+      messages: [
+        { role: "system", content: prompt(from, to.toString(), ctx) },
+        { role: "user", content: jsonStr },
+      ],
+      model: "gpt-3.5-turbo",
+    });
+    translationJobs.push(chatPromise);
+
+    chatPromise.then((chatCompletion) => {
+      // Print the result
+      const choice = chatCompletion.choices[0];
+
+      if (choice.message.content === "") {
+        console.error("Error translating to", to);
+        console.error("Finish Reason", choice.finish_reason);
+        process.exit(1);
+      }
+
+      if (save) {
+        console.log(`Saving to ${to}.json`);
+        fs.writeFileSync(`${to}.json`, choice.message.content);
+      } else {
+        console.log(choice.message.content);
+      }
+    });
+  };
+
+  main(args);
+  await Promise.all(translationJobs);
+  console.log("Done");
+})();
