@@ -27,9 +27,8 @@ npm install -g i18n-openai-translate
 
 Simply run the following command inside your `i18n` folder:
 
-
 ```bash
-i18n-openai-translate --input ./i18n/en.json --languages fr,es,de
+i18n-openai-translate.CMD  -i en.json --to fr
 ```
 
 ---
@@ -42,7 +41,7 @@ You can set up your OpenAI API Key by setting the `OPENAI_API_KEY` environment v
 
 ## 🔒 License
 
-This project is [MIT](LICENSE) licensed.
+This project is [GPLv2](LICENSE) licensed.
 
 ---
 
