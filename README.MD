@@ -28,7 +28,7 @@ npm install -g i18n-openai-translate
 Simply run the following command inside your `i18n` folder:
 
 ```bash
-i18n-openai-translate.CMD  -i en.json --to fr
+i18n-openai-translate  -i en.json --to fr
 ```
 
 ---
