@@ -1,11 +1,12 @@
 export type Result<Result, Error> = OkT<Result> | ErrT<Error>;
-export type OkT<Result> = {
+
+export type OkT<T> = {
   kind: "result";
-  result: Result;
+  result: T;
 };
-export type ErrT<Error> = {
+export type ErrT<T> = {
   kind: "failure";
-  error: Error;
+  error: T;
 };
 
 export function Ok<Result>(result: Result): OkT<Result> {
@@ -22,13 +23,4 @@ export function Err<Error>(error: Error): ErrT<Error> {
   };
 }
 
-export interface Translator {
-  translate(
-    text: string,
-    from: string,
-    to: string,
-    ctx: string
-  ): Promise<Result<string, unknown>>;
-  help(): void;
-  name: string
-}
+export type TranslationResult = Result<string, Error>;

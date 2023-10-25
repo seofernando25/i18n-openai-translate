@@ -1,4 +1,4 @@
-import { Err, Ok, Result, Translator } from "@src/translation_service";
+import { Err, Ok, TranslationResult } from "@src/translation_service";
 import OpenAI from "openai";
 
 let client: OpenAI | null = null;
@@ -12,21 +12,14 @@ function prompt(
   return `Translate an i18n JSON from ${from_language} to ${to_language} in the context of "${ctx}"\n[INPUT]\n${input}`.trim();
 }
 
-function help() {
-  console.log("OpenAI Translation API");
-  console.log();
-  console.log("Required Environment Variables:");
-  console.log("Make sure to set OPENAI_API_KEY in your environment");
-}
-
-async function translate(
+export async function translate(
   text: string,
   from: string,
   to: string,
   ctx: string
-): Promise<Result<string, unknown>> {
+): Promise<TranslationResult> {
   if (!process.env.OPENAI_API_KEY) {
-    return Err("No API Key set");
+    return Err(new Error("No API Key set"));
   }
 
   try {
@@ -45,21 +38,21 @@ async function translate(
     });
 
     if (!res.choices || res.choices.length === 0) {
-      return Err("No results from completion");
+      return Err(new Error("No results from completion"));
     }
 
     const choice = res.choices[0];
 
     if (!choice.text) {
-      return Err("No text in choice");
+      return Err(new Error("No text in choice"));
     }
 
     if (choice.finish_reason === "length") {
-      return Err("Result too long");
+      return Err(new Error("Result too long"));
     }
 
     if (choice.finish_reason === "content_filter") {
-      return Err("Inappropriate content");
+      return Err(new Error("Inappropriate content"));
     }
 
     return Ok(choice.text);
@@ -67,8 +60,3 @@ async function translate(
     return Err(e);
   }
 }
-export default {
-  name: "openai",
-  translate,
-  help,
-} satisfies Translator;

@@ -1,5 +1,5 @@
 {
-  "name": "ai18n-gen",
+  "name": "i18n-openai-translate",
   "version": "0.0.1",
   "description": "",
   "main": "./dist/index.js",
