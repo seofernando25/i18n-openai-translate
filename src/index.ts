@@ -53,12 +53,18 @@ Context = ${ctx}
       alias: "s",
     },
 
-    providers: {
-      type: "array",
-      describe: "The providers to use in order of fallback. Available: openai",
-      default: "openai",
+    pretty: {
+      type: "boolean",
+      describe: "Pretty print the output",
       alias: "p",
     },
+
+    // providers: {
+    //   type: "array",
+    //   describe: "The providers to use in order of fallback. Available: openai",
+    //   default: "openai",
+    //   alias: "p",
+    // },
   }).argv;
 
   if (args.languages && args.languages.includes("tc_all")) {
@@ -72,7 +78,7 @@ Context = ${ctx}
   const translationJobs: Promise<unknown>[] = [];
 
   const main = async (argv: typeof args) => {
-    const { from, to, languages, input, ctx, save } = argv;
+    const { from, to, languages, input, ctx, save, pretty } = argv;
 
     if ((!to && !languages) || (to && languages)) {
       console.error("You must specify either --to or --languages");
@@ -128,11 +134,13 @@ Context = ${ctx}
         process.exit(1);
       }
 
+      const content = JSON.parse(choice.message.content, null);
+      const contentStr = JSON.stringify(content, null, pretty ? 2 : 0);
       if (save) {
         console.log(`Saving to ${to}.json`);
-        fs.writeFileSync(`${to}.json`, choice.message.content);
+        fs.writeFileSync(`${to}.json`, contentStr);
       } else {
-        console.log(choice.message.content);
+        console.log(contentStr);
       }
     });
   };
