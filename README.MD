@@ -2,6 +2,8 @@
 
 > 🤖 Automagically translate your i18n JSON files into multiple languages using OpenAI's API! 🌐
 
+> ⚠️ NOT FOR PRODUCTION
+
 ---
 
 ## 🚀 Features
@@ -9,7 +11,7 @@
 - 🌍 Translate `en.json` into multiple languages (`fr.json`, `es.json`, etc.)
 - 💾 Saves directly into your `i18n` folder.
 - ⚙️ Easy to configure.
-- 🚫 No more manual translation!
+- 🚫 No more manual translations!
 
 ---
 
