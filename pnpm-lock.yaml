@@ -15,8 +15,8 @@ devDependencies:
     specifier: ^5.3.0
     version: 5.3.0
   openai:
-    specifier: ^4.13.0
-    version: 4.13.0
+    specifier: ^4.20.1
+    version: 4.20.1
   tsup:
     specifier: ^7.2.0
     version: 7.2.0(typescript@5.2.2)
@@ -853,8 +853,8 @@ packages:
       mimic-fn: 2.1.0
     dev: true
 
-  /openai@4.13.0:
-    resolution: {integrity: sha512-EPqHcB0got9cXDZmQae1KytgA4YWtTnUc7tV8hlahZtcO70DMa4kiaXoxnutj9lwmeKQO7ntG+6pmXtrCMejuQ==}
+  /openai@4.20.1:
+    resolution: {integrity: sha512-Dd3q8EvINfganZFtg6V36HjrMaihqRgIcKiHua4Nq9aw/PxOP48dhbsk8x5klrxajt5Lpnc1KTOG5i1S6BKAJA==}
     hasBin: true
     dependencies:
       '@types/node': 18.18.6

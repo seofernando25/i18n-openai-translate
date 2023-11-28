@@ -30,11 +30,15 @@ export async function translate(
       });
     }
 
-    const res = await client.completions.create({
-      model: "gpt-3.5-turbo-instruct",
-      prompt: prompt(from, to, ctx || "General Translation", text),
-      temperature: 0,
-      n: 1,
+    const res = await client.chat.completions.create({
+      model: "gpt-3.5-turbo-16k",
+      messages: [
+        {
+          role: "system",
+          content: prompt(from, to, ctx || "General Translation", text),
+        },
+      ],
+      response_format: { type: "json_object" },
       max_tokens: max_tokens,
     });
 
@@ -43,8 +47,7 @@ export async function translate(
     }
 
     const choice = res.choices[0];
-
-    if (!choice.text) {
+    if (!choice.message.content) {
       return Err(new Error("No text in choice"));
     }
 
@@ -56,7 +59,7 @@ export async function translate(
       return Err(new Error("Inappropriate content"));
     }
 
-    return Ok(choice.text);
+    return Ok(choice.message.content);
   } catch (e) {
     return Err(e);
   }

@@ -19,7 +19,7 @@
     "@types/node": "^20.8.8",
     "@types/yargs": "^17.0.29",
     "chalk": "^5.3.0",
-    "openai": "^4.13.0",
+    "openai": "^4.20.1",
     "tsup": "^7.2.0",
     "typescript": "^5.2.2",
     "yargs": "^17.7.2"
