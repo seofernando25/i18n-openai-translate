@@ -1,6 +1,6 @@
 {
   "name": "i18n-openai-translate",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Translate your i18n JSON files into multiple languages using GPT",
   "repository": {
     "type": "git",

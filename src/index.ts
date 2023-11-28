@@ -35,6 +35,12 @@ const program = yargs(hideBin(process.argv))
     type: "boolean",
     description: "Pretty print the output",
   })
+  .option("max_tokens", {
+    alias: "m",
+    type: "number",
+    description: "The maximum number of tokens to use",
+    default: 1000,
+  })
   .option("input", {
     alias: "i",
     type: "string",

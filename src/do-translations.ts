@@ -7,7 +7,7 @@ function doTranslation(
   argv: MainArgs,
   _translation_jobs: Promise<TranslationResult>[] = []
 ): Promise<TranslationResult>[] {
-  const { from, to, languages, input, ctx, save, pretty } = argv;
+  const { from, to, languages, input, ctx, save, pretty, max_tokens } = argv;
 
   if ((!to && !languages) || (to && languages)) {
     console.error("You must specify either --to or --languages");
@@ -41,7 +41,7 @@ function doTranslation(
     0
   );
 
-  const translationPromise = translate(jsonStr, from, to, ctx);
+  const translationPromise = translate(jsonStr, from, to, ctx, max_tokens);
   _translation_jobs.push(translationPromise);
 
   translationPromise.then((translationResult) => {

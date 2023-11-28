@@ -16,7 +16,8 @@ export async function translate(
   text: string,
   from: string,
   to: string,
-  ctx: string
+  ctx: string,
+  max_tokens: number
 ): Promise<TranslationResult> {
   if (!process.env.OPENAI_API_KEY) {
     return Err(new Error("No API Key set"));
@@ -34,7 +35,7 @@ export async function translate(
       prompt: prompt(from, to, ctx || "General Translation", text),
       temperature: 0,
       n: 1,
-      max_tokens: 1000,
+      max_tokens: max_tokens,
     });
 
     if (!res.choices || res.choices.length === 0) {
