@@ -58,13 +58,3 @@ Here are the usage flags for the program:
 ## 🔒 License
 
 This project is [GPLv2](LICENSE) licensed.
-
----
-
-## 🌟 Show your support
-
-Give a ⭐️ if this project helped you!
-
----
-
-💡 **Happy Coding!** 🎉
