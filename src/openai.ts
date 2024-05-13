@@ -31,7 +31,7 @@ export async function translate(
     }
 
     const res = await client.chat.completions.create({
-      model: "gpt-3.5-turbo-16k",
+      model: "gpt-3.5-turbo",
       messages: [
         {
           role: "system",
