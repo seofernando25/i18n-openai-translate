@@ -10,7 +10,8 @@
   "bin": "./dist/index.js",
   "scripts": {
     "watch": "tsup --watch",
-    "buildinstall": "tsup && pnpm link --global"
+    "buildinstall": "tsup && pnpm link --global",
+    "build": "tsup"
   },
   "keywords": [],
   "author": "",
